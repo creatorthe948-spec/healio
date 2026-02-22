@@ -37,11 +37,13 @@ import {
 
 // Initialize Gemini
 // We use a fallback to empty string to prevent ReferenceErrors in the browser
-const API_KEY = typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '';
-const genAI = new GoogleGenAI({ apiKey: API_KEY || '' });
+const API_KEY = process.env.GEMINI_API_KEY || '';
+const genAI = new GoogleGenAI({ apiKey: API_KEY });
 
 export default function App() {
-  console.log("Healio app initializing...");
+  useEffect(() => {
+    console.log("Healio app initializing...");
+  }, []);
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'tools'>('home');
   const [language, setLanguage] = useState<Language>('English');
   const [messages, setMessages] = useState<Message[]>([
@@ -71,8 +73,15 @@ export default function App() {
     window.addEventListener('online', handleStatusChange);
     window.addEventListener('offline', handleStatusChange);
     
-    fetch('/api/diseases').then(res => res.json()).then(setLocalDiseases);
-    fetch('/api/health-tips').then(res => res.json()).then(data => setHealthTip(data.tip));
+    fetch('/api/diseases')
+      .then(res => res.json())
+      .then(setLocalDiseases)
+      .catch(err => console.error("Failed to fetch diseases:", err));
+      
+    fetch('/api/health-tips')
+      .then(res => res.json())
+      .then(data => setHealthTip(data.tip))
+      .catch(err => console.error("Failed to fetch health tips:", err));
 
     // India-specific seasonal alerts (Mock logic based on current month)
     const month = new Date().getMonth();
@@ -139,7 +148,7 @@ export default function App() {
       } else if (isOnline) {
         // AI Response
         const result = await genAI.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3-flash-preview",
           contents: [{
             parts: [{
               text: `You are Healio, a health awareness assistant. 
