@@ -36,15 +36,9 @@ import {
 } from './types';
 
 // Initialize Gemini
-const getApiKey = () => {
-  try {
-    return process.env.GEMINI_API_KEY || '';
-  } catch (e) {
-    return '';
-  }
-};
-
-const genAI = new GoogleGenAI({ apiKey: getApiKey() });
+// We use a fallback to empty string to prevent ReferenceErrors in the browser
+const API_KEY = typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '';
+const genAI = new GoogleGenAI({ apiKey: API_KEY || '' });
 
 export default function App() {
   console.log("Healio app initializing...");
