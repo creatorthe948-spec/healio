@@ -36,9 +36,18 @@ import {
 } from './types';
 
 // Initialize Gemini
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+const getApiKey = () => {
+  try {
+    return process.env.GEMINI_API_KEY || '';
+  } catch (e) {
+    return '';
+  }
+};
+
+const genAI = new GoogleGenAI({ apiKey: getApiKey() });
 
 export default function App() {
+  console.log("Healio app initializing...");
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'tools'>('home');
   const [language, setLanguage] = useState<Language>('English');
   const [messages, setMessages] = useState<Message[]>([
